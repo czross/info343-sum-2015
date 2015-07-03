@@ -34,5 +34,34 @@ $(function() {
 
     var tasks = new TaskList();
 
+    tasks.on('all', function() {
+        var taskList = $('.task-list');
+        taskList.empty();
+
+        this.forEach(function(task) {
+           var taskItem = $(document.createElement('li'));
+            taskItem.text(task.get('title'));
+           taskList.append(taskItem);
+
+        });
+    });
+
     tasks.fetch();
+
+    $('.form-new-task').submit(function(evt) {
+        evt.preventDefault();
+        var newTaskForm = $(this);
+        var newTitleInput = newTaskForm.find('.new-task-title');
+        var newTask = new Task();
+        newTask.set('title', newTitleInput.val());
+        newTask.set('user', currentUser);
+        newTask.set('done', false);
+
+        newTask.save().then(function() {
+            tasks.add(newTask);
+            newTitleInput.val('');
+        }, function(err) {
+            showError(err);
+        });
+    });
 });
